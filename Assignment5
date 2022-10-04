@@ -1,0 +1,100 @@
+import csv
+import random
+import os
+
+def longitudeCompare(random_long,guess_long,guess_country):
+    """
+    This function compares the longitude of attempts with the randomly assigned longitude
+    """
+    if float(random_long) > float(guess_long): #compare the longitude of that lattritude
+
+        print('I am located east of ' + guess_country)
+
+    else:                                       #compare the longitude of that lattritude
+
+        print('I am located west of ' + guess_country)
+
+
+
+if __name__=="__main__":
+
+    name = input("Please enter your full name here: ")
+    print("Welcom ", name, " Game Start! Enjoy! ") 
+
+    cwd = os.getcwd()
+
+    #read the country file
+    try: 
+        file_handle = open(cwd +'/Countries.csv')
+        reader = csv.DictReader(file_handle)
+        countries =list(reader)
+        file_handle.close()
+
+    except IOError as e:
+        print("fail to read on Countries.csv")
+
+    randomcountry=random.choice(countries)
+
+    guess= ""
+    attempts = 0
+    unmatched = False
+
+    """
+    except IOError as e:
+        print("fail to write on file")
+    """
+
+    #write down each attempt in log.txt by first creating a new file
+    try:
+        file = open(cwd+'/log.txt','w')
+        file.write('country, attempt\n')
+        file.close()
+
+    except IOError as e:
+        print("fail to write on log.txt")
+        
+
+    while guess != randomcountry['country'] and attempts <10:
+
+        #write down random assigned country
+        try: 
+            file = open(cwd+'/log.txt','a')
+            file.write(randomcountry['country']+', ')
+            file.close()
+
+        except IOError as e:
+            print("fail to append on log.txt")
+        
+        
+        guess = input('What country am I ').casefold()
+
+        #write down the attempt
+        try: 
+            file = open(cwd+'/log.txt','a')
+            file.write(guess+'\n')
+            file.close()
+
+        except IOError as e:
+            print("fail to append on log.txt")
+
+        attempts += 1
+        if guess == randomcountry['country'].casefold():
+            print('Well done! You have successfully identified the country')
+            break
+        if attempts >= 10:
+            print('You are fresh out of guesses!')
+            break
+
+        for country in countries:
+            if guess.casefold()== country['country'].casefold():
+                if float(randomcountry['lat']) > float(country['lat']):#when the lattitude is more north 
+                    print('I am located north of '+ guess)
+                    longitudeCompare(randomcountry['long'],country['long'],guess)
+                    break       
+
+                else:                                                 #when the lattitude is more south
+                    print('I am located south of ' + guess)
+                    longitudeCompare(randomcountry['long'],country['long'],guess)
+                    break
+
+        
